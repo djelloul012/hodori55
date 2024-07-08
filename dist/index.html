@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>CodePen - A Pen by mohamed el hadi djelloul</title>
+  
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance App</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Center content horizontally and vertically */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 960px;
+            margin: auto;
+            padding: 20px;
+            background: #fff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        /* Styles specific to different sections */
+        section {
+            display: none;
+            padding: 20px;
+        }
+        section.active {
+            display: block;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        /* Table styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 8px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        td {
+            background-color: #fff;
+        }
+        /* Button styles */
+        .navigation a, .action-buttons a, .action-buttons button, .statistics-buttons button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .navigation a:hover, .action-buttons a:hover, .action-buttons button:hover, .statistics-buttons button:hover {
+            background-color: #45a049;
+        }
+        /* Form and input styles */
+        .room-form {
+            margin-bottom: 20px;
+        }
+        .room-form label, .room-form input {
+            margin-right: 10px;
+        }
+        /* Statistics section styles */
+        #statisticsContainer {
+            margin-bottom: 20px;
+            padding: 20px;
+            background: #fff;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        }
+        #statisticsContainer h2 {
+            margin-bottom: 10px;
+        }
+        #personDropdown {
+            margin-bottom: 10px;
+        }
+        #downloadStatsLink, #downloadImageLink {
+            display: block;
+            padding: 10px 20px;
+            margin-top: 10px;
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #downloadStatsLink:hover, #downloadImageLink:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Welcome Page -->
+        <section id="welcomePage" class="active">
+            <h1>Welcome to the Attendance App!</h1>
+            <div class="navigation">
+                <a href="#" onclick="showPage('roomManagement')">Start</a>
+                <a href="#" onclick="showPage('savedRooms')">View Records</a>
+            </div>
+        </section>
+
+        <!-- Room Management Page -->
+        <section id="roomManagement">
+            <h1>Room Management</h1>
+            <div class="room-form">
+                <label for="roomName">Room Name:</label>
+                <input type="text" id="roomName" placeholder="Enter Room Name">
+                <button onclick="addRoom()">Add Room</button>
+            </div>
+            <div id="roomsContainer"></div>
+            <div class="action-buttons">
+                <a href="#" onclick="showPage('savedRooms')">View Saved Rooms</a>
+            </div>
+        </section>
+
+        <!-- Saved Rooms Page -->
+        <section id="savedRooms">
+            <h1>Saved Rooms</h1>
+            <div>
+                <label for="monthFilter">Filter by Month:</label>
+                <select id="monthFilter" onchange="filterByMonth()">
+                    <option value="all">All</option>
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+            </div>
+            <div id="savedRoomsContainer"></div>
+            <div class="action-buttons">
+                <button onclick="downloadFilteredTables()">Download Filtered Tables</button>
+                <button onclick="showPage('roomManagement')">Back to Room Management</button>
+            </div>
+        </section>
+
+        <!-- Statistics Page -->
+        <section id="statisticsPage">
+            <div id="statisticsContainer">
+                <h2>Statistics for <span id="personName"></span></h2>
+                <select id="personDropdown" onchange="updateStatistics()"></select>
+                <select id="monthStatisticsFilter" onchange="updateStatistics()">
+                    <option value="all">All</option>
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+                <p id="presentCount"></p>
+                <p id="absentCount"></p>
+                <p id="lateCount"></p>
+                <div class="statistics-buttons">
+                    <button onclick="convertStatsToImage()">Download as Image</button>
+                    <button onclick="showPage('savedRooms')">Back to Saved Rooms</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- JavaScript Libraries -->
+        <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.0/xlsx.full.min.js"></script>
+        <script>
+            // JavaScript code here
+            document.addEventListener('DOMContentLoaded', function() {
+                // Initial setup
+                showPage('welcomePage');
+            });
+
+            let rooms = JSON.parse(localStorage.getItem('rooms')) || [];
+
+            function showPage(pageId) {
+                // Hide all sections
+                document.querySelectorAll('section').forEach(section => {
+                    section.classList.remove('active');
+                });
+
+                // Show the selected section
+                document.getElementById(pageId).classList.add('active');
+
+                // Render content based on page
+                switch (pageId) {
+                    case 'roomManagement':
+                        renderRooms();
+                        break;
+                    case 'savedRooms':
+                        renderSavedRooms();
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            function renderRooms() {
+                const roomsContainer = document.getElementById('roomsContainer');
+                roomsContainer.innerHTML = '';
+                rooms.forEach((room, roomIndex) => {
+                    const roomDiv = document.createElement('div');
+                    roomDiv.classList.add('room');
+                    roomDiv.innerHTML = `
+                        <h2>${room.name}</h2>
+                        <div>
+                            <label for="personType-${roomIndex}">Select person type:</label>
+                            <select id="personType-${roomIndex}">
+                                <option value="student">Student</option>
+                                <option value="employee">Employee</option>
+                            </select>
+                        </div>
+                        <input type="text" id="studentName-${roomIndex}" placeholder="Student/Employee Name">
+                        <button onclick="addPerson(${roomIndex})">Add Person</button>
+                        <table class="students">
+                            <thead>
+                                <tr>
+                                    <th>Person Name</th>
+                                    <th>Present</th>
+                                    <th>Absent</th>
+                                    <th>Late</th>
+                                </tr>
+                            </thead>
+                            <tbody id="students-${roomIndex}">
+                                ${room.students.map((student, studentIndex) => `
+                                    <tr>
+                                        <td>${student.name}</td>
+                                        <td><input type="radio" name="status-${roomIndex}-${studentIndex}" value="present"></td>
+                                        <td><input type="radio" name="status-${roomIndex}-${studentIndex}" value="absent"></td>
+                                        <td><input type="radio" name="status-${roomIndex}-${studentIndex}" value="late"></td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                        <button onclick="saveAttendance(${roomIndex})">Save Attendance</button>
+                        <button onclick="deleteRoom(${roomIndex})">Delete Room</button>
+                    `;
+                    roomsContainer.appendChild(roomDiv);
+                });
+            }
+
+            function addRoom() {
+                const roomNameInput = document.getElementById('roomName');
+                const roomName = roomNameInput.value.trim();
+                if (roomName) {
+                    rooms.push({
+                        name: roomName,
+                        students: [],
+                        attendance: []
+                    });
+                    roomNameInput.value = '';
+                    saveToLocalStorage();
+                    renderRooms();
+                } else {
+                    alert('Please enter a room name.');
+                }
+            }
+
+            function addPerson(roomIndex) {
+                const studentNameInput = document.getElementById(`studentName-${roomIndex}`);
+                const studentName = studentNameInput.value.trim();
+                if (studentName) {
+                    rooms[roomIndex].students.push({
+                        name: studentName
+                    });
+                    studentNameInput.value = '';
+                    saveToLocalStorage();
+                    renderRooms();
+                } else {
+                    alert('Please enter a person name.');
+                }
+            }
+
+            function saveAttendance(roomIndex) {
+                const room = rooms[roomIndex];
+                const attendance = {
+                    date: new Date().toLocaleDateString('en-GB'),
+                    time: new Date().toLocaleTimeString('en-GB'),
+                    status: []
+                };
+                room.students.forEach((student, studentIndex) => {
+                    const status = document.querySelector(`input[name="status-${roomIndex}-${studentIndex}"]:checked`);
+                    attendance.status.push(status ? status.value : 'absent');
+                });
+                room.attendance.push(attendance);
+                saveToLocalStorage();
+                renderSavedRooms();
+            }
+
+            function deleteRoom(roomIndex) {
+                if (confirm("Are you sure you want to delete this room?")) {
+                    rooms.splice(roomIndex, 1);
+                    saveToLocalStorage();
+                    renderRooms();
+                }
+            }
+
+            function renderSavedRooms() {
+                const savedRoomsContainer = document.getElementById('savedRoomsContainer');
+                savedRoomsContainer.innerHTML = '';
+                const selectedMonth = document.getElementById('monthFilter').value;
+                const filteredRooms = rooms.map(room => {
+                    const filteredAttendance = room.attendance.filter(entry => {
+                        const entryMonth = new Date(entry.date.split('/').reverse().join('-')).getMonth() + 1;
+                        return selectedMonth === 'all' || entryMonth == selectedMonth;
+                    });
+                    return { ...room, attendance: filteredAttendance };
+                });
+
+                filteredRooms.forEach((room, roomIndex) => {
+                    const roomDiv = document.createElement('div');
+                    roomDiv.classList.add('room');
+                    roomDiv.innerHTML = `
+                        <h2>${room.name}</h2>
+                        <table class="saved-rooms-container">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    ${room.students.map(student => `<th>${student.name}</th>`).join('')}
+                                </tr>
+                            </thead>
+                            <tbody id="savedRoom-${roomIndex}">
+                                ${room.attendance.map((entry, entryIndex) => `
+                                    <tr>
+                                        <td>${entry.date}</td>
+                                        <td>${entry.time}</td>
+                                        ${entry.status.map(status => `
+                                            <td>${status}</td>
+                                        `).join('')}
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                        <button onclick="viewStatisticsFromSavedRooms('${room.name}')">View Statistics</button>
+                        <button onclick="deleteSavedRoom(${roomIndex})">Delete Room</button>
+                    `;
+                    savedRoomsContainer.appendChild(roomDiv);
+                });
+            }
+
+            function filterByMonth() {
+                renderSavedRooms();
+            }
+
+            function viewStatisticsFromSavedRooms(roomName) {
+                const room = rooms.find(r => r.name === roomName);
+                const personDropdown = document.getElementById('personDropdown');
+                personDropdown.innerHTML = room.students.map((student, index) => `
+                    <option value="${index}">${student.name}</option>
+                `).join(' ');
+
+                const monthStatisticsFilter = document.getElementById('monthStatisticsFilter');
+                monthStatisticsFilter.value = document.getElementById('monthFilter').value;
+
+                personDropdown.onchange = () => updateStatistics(roomName, personDropdown.value);
+                personDropdown.dispatchEvent(new Event('change'));
+
+                showPage('statisticsPage');
+            }
+
+            function updateStatistics(roomName, personIndex) {
+                const room = rooms.find(r => r.name === roomName);
+                const person = room.students[personIndex];
+                const statsContainer = document.getElementById('statisticsContainer');
+                const selectedMonth = document.getElementById('monthStatisticsFilter').value;
+
+                const filteredAttendance = room.attendance.filter(entry => {
+                    const entryMonth = new Date(entry.date.split('/').reverse().join('-')).getMonth() + 1;
+                    return selectedMonth === 'all' || entryMonth == selectedMonth;
+                });
+
+                const presentCount = filteredAttendance.filter(entry => entry.status[personIndex] === 'present').length;
+                const absentCount = filteredAttendance.filter(entry => entry.status[personIndex] === 'absent').length;
+                const lateCount = filteredAttendance.filter(entry => entry.status[personIndex] === 'late').length;
+
+                document.getElementById('personName').textContent = person.name;
+                document.getElementById('presentCount').textContent = `Present: ${presentCount}`;
+                document.getElementById('absentCount').textContent = `Absent: ${absentCount}`;
+                document.getElementById('lateCount').textContent = `Late: ${lateCount}`;
+            }
+
+            function deleteSavedRoom(roomIndex) {
+                if (confirm("Are you sure you want to delete this saved room?")) {
+                    rooms.splice(roomIndex, 1);
+                    saveToLocalStorage();
+                    renderSavedRooms();
+                }
+            }
+
+            function saveToLocalStorage() {
+                localStorage.setItem('rooms', JSON.stringify(rooms));
+            }
+
+            function downloadFilteredTables() {
+                const monthFilter = document.getElementById('monthFilter').value;
+                const filteredRooms = rooms.map(room => {
+                    const filteredAttendance = room.attendance.filter(entry => {
+                        const entryMonth = new Date(entry.date.split('/').reverse().join('-')).getMonth() + 1;
+                        return monthFilter === 'all' || entryMonth == monthFilter;
+                    });
+                    return { ...room, attendance: filteredAttendance };
+                });
+
+                let workbook = XLSX.utils.book_new();
+                filteredRooms.forEach(room => {
+                    const roomData = [
+                        ['Date', 'Time', ...room.students.map(student => student.name)]
+                    ];
+                    room.attendance.forEach(entry => {
+                        roomData.push([entry.date, entry.time, ...entry.status]);
+                    });
+                    const worksheet = XLSX.utils.aoa_to_sheet(roomData);
+                    XLSX.utils.book_append_sheet(workbook, worksheet, room.name);
+                });
+                XLSX.writeFile(workbook, `FilteredRooms_${monthFilter}.xlsx`);
+            }
+
+            function convertStatsToImage() {
+                const statisticsSection = document.getElementById('statisticsContainer');
+                html2canvas(statisticsSection).then(canvas => {
+                    const imgData = canvas.toDataURL('image/png');
+                    const link = document.createElement('a');
+                    link.href = imgData;
+                    link.download = 'statistics.png';
+                    link.textContent = 'Download Image';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                });
+            }
+        </script>
+    </div>
+</body>
+</html>
+<!-- partial -->
+  
+</body>
+</html>
